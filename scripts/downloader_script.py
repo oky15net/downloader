@@ -5,10 +5,12 @@ import gradio as gr
 import modules.scripts as scripts
 from modules import script_callbacks
 
-def download_file(url, download_folder="downloads"):
+def download_file(url, filename, download_folder="downloads"):
     if not url:
         return "URL tidak valid"
-    local_filename = os.path.join(download_folder, url.split('/')[-1])
+    if not filename:
+        filename = url.split('/')[-1]
+    local_filename = os.path.join(download_folder, filename)
     os.makedirs(download_folder, exist_ok=True)
     try:
         with requests.get(url, stream=True) as r:
@@ -24,10 +26,11 @@ def on_ui_tabs():
     with gr.Blocks(analytics_enabled=False) as ui_component:
         with gr.Row():
             url_input = gr.Textbox(label="Direct Link URL")
+            filename_input = gr.Textbox(label="File Name (optional)")
             download_button = gr.Button("Download")
             output = gr.Textbox(label="Download Path")
 
-            download_button.click(fn=download_file, inputs=url_input, outputs=output)
+            download_button.click(fn=download_file, inputs=[url_input, filename_input], outputs=output)
 
         return [(ui_component, "Downloader Extension", "downloader_extension_tab")]
 
