@@ -2,6 +2,8 @@
 import requests
 import os
 import gradio as gr
+import modules.scripts as scripts
+from modules import script_callbacks
 
 def download_file(url, download_folder="downloads"):
     if not url:
@@ -18,16 +20,15 @@ def download_file(url, download_folder="downloads"):
     except Exception as e:
         return f"Terjadi kesalahan: {str(e)}"
 
-def create_ui():
-    with gr.Blocks() as downloader:
-        gr.Markdown("## File Downloader")
-        url_input = gr.Textbox(label="Direct Link URL")
-        download_button = gr.Button("Download")
-        output = gr.Textbox(label="Download Path")
+def on_ui_tabs():
+    with gr.Blocks(analytics_enabled=False) as ui_component:
+        with gr.Row():
+            url_input = gr.Textbox(label="Direct Link URL")
+            download_button = gr.Button("Download")
+            output = gr.Textbox(label="Download Path")
 
-        download_button.click(fn=download_file, inputs=url_input, outputs=output)
-    
-    downloader.launch()
+            download_button.click(fn=download_file, inputs=url_input, outputs=output)
 
-if __name__ == "__main__":
-    create_ui()
+        return [(ui_component, "Downloader Extension", "downloader_extension_tab")]
+
+script_callbacks.on_ui_tabs(on_ui_tabs)
